@@ -62,11 +62,18 @@ export function Game({ pitch, isActive, onGameOver }: GameProps) {
     [finishZ, onGameOver, hasWon],
   );
 
-  // Camera follows ball from the side
-  useFrame(() => {
-    camera.position.x = GAME_CONFIG.CAMERA.OFFSET_X;
-    camera.position.y = GAME_CONFIG.CAMERA.OFFSET_Y;
-    camera.position.z = ballZ + GAME_CONFIG.CAMERA.OFFSET_Z;
+  // Camera follows ball from the side (responsive to screen size)
+  useFrame(({ viewport }) => {
+    // Adjust camera position based on aspect ratio
+    // On portrait (mobile), use less side offset; on landscape, use more
+    const isPortrait = viewport.aspect < 1;
+    const sideOffset = isPortrait ? 4 : GAME_CONFIG.CAMERA.OFFSET_X;
+    const heightOffset = isPortrait ? 6 : GAME_CONFIG.CAMERA.OFFSET_Y;
+    const distanceOffset = isPortrait ? 8 : GAME_CONFIG.CAMERA.OFFSET_Z;
+
+    camera.position.x = sideOffset;
+    camera.position.y = heightOffset;
+    camera.position.z = ballZ + distanceOffset;
     camera.lookAt(0, 2.5, ballZ - GAME_CONFIG.CAMERA.LOOK_AHEAD);
   });
 
